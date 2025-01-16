@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Калькулятор пребывания</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <img src="images/logo.png" alt="Логотип">
+            <h1>Департамент Пограничной Службы Республики Казахстан по ЗКО</h1>
+            <h2>Учебный центр "Орал"</h2>
+    <link rel="stylesheet" href="css/styles.css">
+        <style>
+        #180-days-result {
+            color: green;         /* Зелёный цвет текста */
+            font-weight: bold;    /* Жирный шрифт */
+            font-size: 32px;      /* Размер текста в два раза больше */
+        }
+
+        .logo img {
+            max-width: 300px;
+            opacity: 0; /* Начальное состояние прозрачности */
+            transform: scale(0.5); /* Начальное состояние уменьшения */
+            animation: logoFadeIn 2s ease-in forwards; /* Анимация появления */
+        }
+
+        /* Анимация появления */
+        @keyframes logoFadeIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Для вычесленя 180 дней назад ведите дату</h1>
+    <div id="calendar-container">
+        <input type="date" id="calendar" />
+        <button onclick="setDate180DaysAgo()">Показать 180 дней назад</button>
+    </div>
+
+    <div id="180-days-result-container">
+        Дата 180 дней назад: <span id="180-days-result"></span>
+    </div>
+</div>
+
+        <h2>Калькулятор расчета дней пребывания иностранных граждан в РК</h2>
+        <div id="date-container">
+            <div class="date-group">
+                <input type="date" class="entry-date" placeholder="Дата въезда">
+                <input type="date" class="exit-date" placeholder="Дата выезда">
+                <span class="result-box">0</span>
+                <button class="remove">-</button>
+            </div>
+        </div>
+        <button id="add-date" class="add-button">Добавить въезд/выезд</button>
+        <div class="actions">
+            <button id="calculate">Рассчитать</button>
+            <button id="reset" class="reset">Сброс</button>
+        </div>
+        <div class="total-days">
+            Общее количество дней: <span id="total-days">0</span>
+        </div>
+        <div id="individual-results"></div>
+    </div>
+
+    <script>
+        // Установить текущую дату
+        document.addEventListener("DOMContentLoaded", () => {
+            const calendar = document.getElementById("calendar");
+            const today = new Date();
+            calendar.value = today.toISOString().split('T')[0];
+        });
+
+        // Функция для вычисления даты 180 дней назад
+        function setDate180DaysAgo() {
+            const calendar = document.getElementById("calendar");
+            const today = new Date(calendar.value);
+            if (!isNaN(today)) {
+                const pastDate = new Date(today);
+                pastDate.setDate(today.getDate() - 180);
+
+                const day = String(pastDate.getDate()).padStart(2, '0');
+                const month = String(pastDate.getMonth() + 1).padStart(2, '0');
+                const year = pastDate.getFullYear();
+                const formattedDate = `${day}.${month}.${year}`;
+
+                document.getElementById("180-days-result").textContent = formattedDate;
+            } else {
+                document.getElementById("180-days-result").textContent = "Неверная дата";
+            }
+        }
+
+        // Добавление новой группы
+        document.getElementById("add-date").addEventListener("click", () => {
+            const dateContainer = document.getElementById("date-container");
+            const newDateGroup = document.createElement("div");
+            newDateGroup.className = "date-group";
+
+            const newEntryInput = document.createElement("input");
+            newEntryInput.type = "date";
+            newEntryInput.className = "entry-date";
+
+            const newExitInput = document.createElement("input");
+            newExitInput.type = "date";
+            newExitInput.className = "exit-date";
+
+            const newResultBox = document.createElement("span");
+            newResultBox.className = "result-box";
+            newResultBox.textContent = "0";
+
+            const removeButton = document.createElement("button");
+            removeButton.textContent = "-";
+            removeButton.className = "remove";
+            removeButton.addEventListener("click", () => dateContainer.removeChild(newDateGroup));
+
+            newDateGroup.append(newEntryInput, newExitInput, newResultBox, removeButton);
+            dateContainer.appendChild(newDateGroup);
+        });
+
+        // Расчет общего количества дней
+        document.getElementById("calculate").addEventListener("click", () => {
+            const entryDates = document.querySelectorAll(".entry-date");
+            const exitDates = document.querySelectorAll(".exit-date");
+            const totalDaysElement = document.getElementById("total-days");
+            let totalDays = 0;
+
+            entryDates.forEach((entryDateElem, index) => {
+                const entryDate = new Date(entryDateElem.value);
+                const exitDate = new Date(exitDates[index].value);
+
+                if (!isNaN(entryDate) && !isNaN(exitDate)) {
+                    const diffTime = exitDate - entryDate;
+                    const days = diffTime / (1000 * 60 * 60 * 24);
+                    if (days > 0) {
+                        totalDays += days;
+                        document.querySelectorAll(".result-box")[index].textContent = days;
+                    } else {
+                        document.querySelectorAll(".result-box")[index].textContent = "0";
+                    }
+                }
+            });
+
+            totalDaysElement.textContent = totalDays;
+        });
+
+        // Сброс данных
+        document.getElementById("reset").addEventListener("click", () => {
+            document.querySelectorAll(".date-group").forEach(group => group.remove());
+            document.getElementById("total-days").textContent = "0";
+        });
+    </script>
+</body>
+</html>
